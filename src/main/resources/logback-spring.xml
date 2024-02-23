@@ -2,7 +2,7 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <springProperty scope="context" name="applicationName" source="spring.application.name"/>
     <springProperty scope="context" name="loggingPath" source="logging.file.path" defaultValue="app/log"/>
-    <springProperty scope="context" name="logstashHost" source="logging.logstash.host" defaultValue="logstash-service"/>
+    <springProperty scope="context" name="logstashHost" source="logging.logstash.host" defaultValue="localhost"/>
     <springProperty scope="context" name="logstashPort" source="logging.logstash.port" defaultValue="5000"/>
 
     <!-- Cấu hình Console Appender -->
@@ -25,7 +25,10 @@
     <!-- Sử dụng biến môi trường hoặc thuộc tính Spring để cấu hình đích đến Logstash -->
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
         <destination>${logstashHost}:${logstashPort}</destination>
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"applicationName":"${applicationName}"}</customFields>
+        </encoder>
+        <reconnectionDelay>10000</reconnectionDelay>
     </appender>
 
     <!-- Thêm các Appender vào Root Logger -->
