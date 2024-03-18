@@ -11,6 +11,8 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DecryptionEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
@@ -22,9 +24,23 @@ public class DecryptionEnvironmentPostProcessor implements EnvironmentPostProces
                 EnumerablePropertySource<?> eps = (EnumerablePropertySource<?>) propertySource;
                 for (String key : eps.getPropertyNames()) {
                     Object value = eps.getProperty(key);
-                    if (value instanceof String && ((String) value).startsWith("ENC(")) {
-                        String decryptedValue = decryptValue(environment, (String) value);
-                        props.setProperty(key, decryptedValue);
+                    if (value instanceof String && ((String) value).contains("ENC(")) {
+
+                        Pattern pattern = Pattern.compile("ENC\\([^)]+\\)");
+                        Matcher matcher = pattern.matcher((String) value);
+
+                        int count = 0;
+                        while (matcher.find()) {
+                            count++;
+                        }
+                        for (int i = 0; i < count; i++) {
+                            int start = ((String) value).indexOf("ENC(");
+                            int end = start + 29;
+                            String maHoa = ((String) value).substring(start, end);
+                            String decryptedValue = decryptValue(environment, maHoa);
+                            value = ((String) value).replace(maHoa, decryptedValue);
+                        }
+                        props.setProperty(key, (String) value);
                     }
                 }
             }
@@ -38,10 +54,10 @@ public class DecryptionEnvironmentPostProcessor implements EnvironmentPostProces
 
     public static String decryptValue(String secretKey, String encryptedValue) {
         try {
-            if(StringUtils.isEmpty(encryptedValue)){
+            if (StringUtils.isEmpty(encryptedValue)) {
                 return encryptedValue;
             }
-            if(!encryptedValue.startsWith("ENC(")){
+            if (!encryptedValue.startsWith("ENC(")) {
                 return encryptedValue;
             }
             // Giả sử rằng encryptedValue bắt đầu bằng tiền tố "ENC(" và kết thúc bằng ")"

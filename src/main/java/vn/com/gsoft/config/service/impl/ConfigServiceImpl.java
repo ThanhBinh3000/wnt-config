@@ -14,6 +14,8 @@ import vn.com.gsoft.config.utils.DecryptionEnvironmentPostProcessor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,7 +34,24 @@ public class ConfigServiceImpl implements ConfigService {
         ps.setName("LOCAL");
         List<ServiceConfig> configs = configRepository.findByApplicationAndEnable(application, enable);
         for(ServiceConfig c: configs){
-            c.setValue(DecryptionEnvironmentPostProcessor.decryptValue(secretKey, c.getValue()));
+            if (c.getValue() instanceof String && c.getValue().contains("ENC(")) {
+                String value = c.getValue();
+                Pattern pattern = Pattern.compile("ENC\\([^)]+\\)");
+                Matcher matcher = pattern.matcher(c.getValue());
+
+                int count = 0;
+                while (matcher.find()) {
+                    count++;
+                }
+                for (int i = 0; i < count; i++) {
+                    int start = c.getValue().indexOf("ENC(");
+                    int end = start + 29;
+                    String maHoa = c.getValue().substring(start, end);
+                    String decryptedValue = DecryptionEnvironmentPostProcessor.decryptValue(secretKey, maHoa);
+                    value = value.replace(maHoa, decryptedValue);
+                }
+                c.setValue(value);
+            }
         }
         Map<String, String> mapConfig = configs.stream().collect(Collectors.toMap(ServiceConfig::getKey, ServiceConfig::getValue));
         ps.setSource(mapConfig);
@@ -49,7 +68,24 @@ public class ConfigServiceImpl implements ConfigService {
         ps.setName("LOCAL");
         List<ServiceConfig> configs = configRepository.findByApplicationAndProfileInAndEnable(application, Arrays.asList(profile.split(",")), enable);
         for(ServiceConfig c: configs){
-            c.setValue(DecryptionEnvironmentPostProcessor.decryptValue(secretKey, c.getValue()));
+            if (c.getValue() instanceof String && c.getValue().contains("ENC(")) {
+                String value = c.getValue();
+                Pattern pattern = Pattern.compile("ENC\\([^)]+\\)");
+                Matcher matcher = pattern.matcher(c.getValue());
+
+                int count = 0;
+                while (matcher.find()) {
+                    count++;
+                }
+                for (int i = 0; i < count; i++) {
+                    int start = c.getValue().indexOf("ENC(");
+                    int end = start + 29;
+                    String maHoa = c.getValue().substring(start, end);
+                    String decryptedValue = DecryptionEnvironmentPostProcessor.decryptValue(secretKey, maHoa);
+                    value = value.replace(maHoa, decryptedValue);
+                }
+                c.setValue(value);
+            }
         }
         Map<String, String> mapConfig = configs.stream()
                 .filter(config -> config.getKey() != null && config.getValue() != null).collect(Collectors.toMap(ServiceConfig::getKey, ServiceConfig::getValue));
@@ -68,7 +104,24 @@ public class ConfigServiceImpl implements ConfigService {
         ps.setName("LOCAL");
         List<ServiceConfig> configs = configRepository.findByApplicationAndProfileInAndLabelAndEnable(application, Arrays.asList(profile.split(",")), label, enable);
         for(ServiceConfig c: configs){
-            c.setValue(DecryptionEnvironmentPostProcessor.decryptValue(secretKey, c.getValue()));
+            if (c.getValue() instanceof String && c.getValue().contains("ENC(")) {
+                String value = c.getValue();
+                Pattern pattern = Pattern.compile("ENC\\([^)]+\\)");
+                Matcher matcher = pattern.matcher(c.getValue());
+
+                int count = 0;
+                while (matcher.find()) {
+                    count++;
+                }
+                for (int i = 0; i < count; i++) {
+                    int start = value.indexOf("ENC(");
+                    int end = start + 29;
+                    String maHoa = value.substring(start, end);
+                    String decryptedValue = DecryptionEnvironmentPostProcessor.decryptValue(secretKey, maHoa);
+                    value = value.replace(maHoa, decryptedValue);
+                }
+                c.setValue(value);
+            }
         }
         Map<String, String> mapConfig = configs.stream()
                 .filter(config -> config.getKey() != null && config.getValue() != null).collect(Collectors.toMap(ServiceConfig::getKey, ServiceConfig::getValue));

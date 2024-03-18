@@ -47,10 +47,16 @@ public class CustomFilter extends GenericFilterBean {
                     Pattern pattern = Pattern.compile("ENC\\([^)]+\\)");
                     Matcher matcher = pattern.matcher(v);
 
+                    int count = 0;
                     while (matcher.find()) {
-                        String enc = matcher.group();
-                        String decryptValueEnc = DecryptionEnvironmentPostProcessor.decryptValue(secretKey, enc);
-                        v = v.replace(enc, decryptValueEnc);
+                        count++;
+                    }
+                    for (int j = 0; j < count; j++) {
+                        int start = v.indexOf("ENC(");
+                        int end = start + 29;
+                        String maHoa = v.substring(start, end);
+                        String decryptedValue = DecryptionEnvironmentPostProcessor.decryptValue(secretKey, maHoa);
+                        v = v.replace(maHoa, decryptedValue);
                     }
                 }
 
