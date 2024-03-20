@@ -5,7 +5,7 @@ import lombok.Data;
 
 
 @Entity
-@Table(name = "SERVICECONFIG", uniqueConstraints = {@UniqueConstraint(columnNames = {"application", "profile", "label", "key"})})
+@Table(name = "ServiceConfig", uniqueConstraints = {@UniqueConstraint(columnNames = {"application", "profile", "label", "key"})})
 @Data
 public class ServiceConfig {
     @Id

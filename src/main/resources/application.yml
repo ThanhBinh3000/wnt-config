@@ -9,11 +9,14 @@ spring:
     name: wnt-config
   datasource:
     url: jdbc:sqlserver://;serverName=10.0.14.40;databaseName=WebNTDB;trustServerCertificate=true
-    username: sa
+    username: WebNTDB
     password: 123456a@
     driver:
       class: com.microsoft.sqlserver.jdbc.SQLServerDriver
   jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
       hibernate:
         dialect: org.hibernate.dialect.SQLServerDialect
@@ -48,7 +51,7 @@ logging:
 
 # security
 security:
-  username: admin
+  username: ENC(Bq7G/JTejfXoJCk8nDp6iw==)
   password: ENC(r8wZZemi/0rdGJOBDoPlFw==)
 
 org:
@@ -68,4 +71,4 @@ eureka:
   client:
     registry-fetch-interval-seconds: 5
     service-url:
-      defaultZone: http://ENC(Bq7G/JTejfXoJCk8nDp6iw==):ENC(M5yFp1/99ty4dXFasyeFBg==)@localhost:8001/eureka/
+      defaultZone: http://ENC(Bq7G/JTejfXoJCk8nDp6iw==):ENC(M5yFp1/99ty4dXFasyeFBg==)@10.0.13.41:8001/eureka/
